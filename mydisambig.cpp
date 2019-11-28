@@ -48,7 +48,7 @@ LogP Viterbi(VocabMap &map,Ngram &lm,VocabString *words,unsigned int wordcnt,Voc
     VocabIndex big5idx[MaxLengthPerLine][MaxNumCandidate]={};
     VocabIndex wbig5idx;
     Prob p;
-    VocabMapIter iter(map,getIndex(voc,words[0]));
+    VocabMapIter iter(map,getIndex(vocz,words[0]));
     for(int i=0;iter.next(wbig5idx,p);i++,num_candidate[0]++)
     {
         LogP currentprob=lm.wordProb(getIndex(voc,vocb.getWord(wbig5idx)),emptycontext);
@@ -62,6 +62,7 @@ LogP Viterbi(VocabMap &map,Ngram &lm,VocabString *words,unsigned int wordcnt,Voc
     {
         VocabIndex wbig5idx;
         Prob p;
+        VocabMapIter iter(map,vocz.getIndex(words[t]));
         for(int i=0;iter.next(wbig5idx,p);i++,num_candidate[t]++)
         {
             prob[t][i]=-1.0/0.0;
