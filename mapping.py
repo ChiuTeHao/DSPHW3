@@ -16,10 +16,13 @@ if __name__=='__main__':
                 if initial not in zhuyingtobig5dic:
                     zhuyingtobig5dic[initial]=[word]
                 else:
-                    zhuyingtobig5dic[initial].append(word)
+                    if word not in zhuyingtobig5dic[initial]:
+                        zhuyingtobig5dic[initial].append(word)
+            if word not in zhuyingtobig5dic:
+                zhuyingtobig5dic[word]=[word]
     with open(sys.argv[2],'w',encoding='big5hkscs') as f:
         for initial,words in zhuyingtobig5dic.items():
             f.write(initial)
             for word in words:
                 f.write(' '+word)
-            f.write('\n')       
+            f.write('\n')
