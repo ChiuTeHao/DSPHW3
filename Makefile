@@ -10,7 +10,7 @@ vpath %.c $(SRC_PATH)
 vpath %.cpp $(SRC_PATH)
 
 TARGET = mydisambig
-SRC = mydisambig.cpp
+SRC = mydisambig.cpp mymap.cpp
 OBJ = $(SRC:.cpp=.o)
 FROM ?= Big5-ZhuYin.map
 TO ?= ZhuYin-Big5.map
@@ -28,5 +28,8 @@ map:mapping.py
 	@#TODO
 	@python3 mapping.py $(FROM) $(TO)
 
+try:try.cpp
+	g++ try.cpp $(CXXFLAGS) -c try.o
+	g++ try.o -o try
 clean:
 	$(RM) $(OBJ) $(TARGET)
