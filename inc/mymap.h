@@ -10,12 +10,14 @@ class MyMap
     public:
         MyMap(Vocab &voc1,Vocab &voc2);
         MyMap();
-        void read(File &file);        
+        void read(File &file);
+        vector<VocabIndex> getVal(VocabIndex idx);
+        void print(); 
     protected:
         map<VocabIndex,set<VocabIndex> > table;
-        Vocab zhuyin,big5;
+        Vocab &zhuyin,&big5;
 };
-class MyMapIter:public MyMap
+class MyMapIter
 {
     public:
         MyMapIter(MyMap &mymap,VocabIndex idx);

@@ -10,7 +10,7 @@ const int MaxLengthPerLine=256;
 const int MaxNumCandidate=1024;
 const VocabIndex emptycontext[]={Vocab_None};
 const LogP delta=-100;
-LogP Viterbi(MyMap &map,Ngram &lm,VocabString *words,unsigned int wordcnt,Vocab &voc,Vocab &vocz,Vocab &vocb);
+LogP Viterbi(MyMap &map,Ngram &lm,VocabString *words,unsigned int wordcnt,Vocab &voc,Vocab &vocz,Vocab &vocb,FILE **fptr);
 VocabIndex getIndex(Vocab &vocab,VocabString w)
 {
     VocabIndex idx=vocab.getIndex(w);
@@ -36,28 +36,29 @@ int main(int argc,char* argv[])
     }*/
     const int ngram_order=2;
     Vocab voc,vocz,vocb;
-    
     Ngram lm(voc,ngram_order);
-    MyMap map(vocz,vocb);
-
+    //VocabMap map(vocz,vocb);
     File lmfile(argv[3],"r");
     lm.read(lmfile);
-
+    
     File mapfile(argv[2],"r");
-    map.read(mapfile);
-
+    //map.read(mapfile);
+    MyMap table(vocz,vocb);
+    table.read(mapfile);
     File testfile(argv[1],"r");
     char *content;
+    FILE *fptr=fopen(argv[4],"w");
     while((content=testfile.getline())!=NULL)
     {
         VocabString words[3000];
         unsigned int wordcnt=Vocab::parseWords(content,&words[1],3000);
         words[0]="<s>";
         words[wordcnt+1]="</s>";
-        LogP prob=Viterbi(map,lm,words,wordcnt+2,voc,vocz,vocb);
+        LogP prob=Viterbi(table,lm,words,wordcnt+2,voc,vocz,vocb,&fptr);
     }
+    fclose(fptr);
 }
-LogP Viterbi(MyMap &map,Ngram &lm,VocabString *words,unsigned int wordcnt,Vocab &voc,Vocab &vocz,Vocab &vocb)
+LogP Viterbi(MyMap &map,Ngram &lm,VocabString *words,unsigned int wordcnt,Vocab &voc,Vocab &vocz,Vocab &vocb,FILE ** fptr)
 {
     LogP prob[MaxLengthPerLine][MaxNumCandidate]={};
     VocabIndex backtrack[MaxLengthPerLine][MaxNumCandidate]={};
@@ -79,7 +80,7 @@ LogP Viterbi(MyMap &map,Ngram &lm,VocabString *words,unsigned int wordcnt,Vocab 
     {
         VocabIndex wbig5idx;
         Prob p;
-        MyMapIter iter(map,getIndex(vocz,words[t]));
+        MyMapIter iter(map,vocz.getIndex(words[t]));
         for(int i=0;iter.next(wbig5idx,p);i++,num_candidate[t]++)
         {
             prob[t][i]=-1.0/0.0;
@@ -117,11 +118,11 @@ LogP Viterbi(MyMap &map,Ngram &lm,VocabString *words,unsigned int wordcnt,Vocab 
        maxpath[i]=backtrack[i+1][maxpath[i+1]];
     for(int t=0;t<wordcnt;t++)
     {
-        printf("%s",vocb.getWord(big5idx[t][maxpath[t]]));
+        fprintf(*fptr,"%s",vocb.getWord(big5idx[t][maxpath[t]]));
         if(t<wordcnt-1)
-            printf(" ");
+            fprintf(*fptr," ");
         else
-            printf("\n");
+            fprintf(*fptr,"\n");
     }
     return prob[wordcnt-1][maxpath[wordcnt]];
 }

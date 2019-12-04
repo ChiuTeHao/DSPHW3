@@ -3,13 +3,9 @@ MyMap::MyMap(Vocab &a,Vocab &b):zhuyin(a),big5(b)
 {
         
 }
-MyMap::MyMap()
-{
-}
 void MyMap::read(File &file)
 {
     char *content;
-    FILE *fptr=fopen("output","w");
     while((content=file.getline())!=NULL)
     {
         VocabString words[3000];
@@ -22,19 +18,19 @@ void MyMap::read(File &file)
         }
     }
     map<VocabIndex,set<VocabIndex> >::iterator it;
-    for(it=table.begin();it!=table.end();it++)
-    {
-        VocabString key=zhuyin.getWord(it->first);
-        set<VocabIndex> validx=it->second;
-        for(set<VocabIndex>::iterator it2=validx.begin();it2!=validx.end();it2++)
-            fprintf(fptr,"%s %s\n",key,big5.getWord(*it2));
-    }
-    fclose(fptr);
+    table[zhuyin.getIndex("<s>")].insert(big5.getIndex("<s>"));
+    table[zhuyin.getIndex("</s>")].insert(big5.getIndex("</s>"));
+}
+vector<VocabIndex> MyMap::getVal(VocabIndex zhuyinidx)
+{
+    vector<VocabIndex> v;
+    for(set<VocabIndex>::iterator it=table[zhuyinidx].begin();it!=table[zhuyinidx].end();it++)
+        v.push_back(*it);
+    return v;
 }
 MyMapIter::MyMapIter(MyMap &mymap,VocabIndex idx)
 {
-    for(set<VocabIndex>::iterator it=table[idx].begin();it!=table[idx].end();it++)
-        vec.push_back(*it);
+    vec=mymap.getVal(idx);
     cnt=0;
 }
 bool MyMapIter::next(VocabIndex &idx,Prob &p)
