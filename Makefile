@@ -10,7 +10,7 @@ vpath %.c $(SRC_PATH)
 vpath %.cpp $(SRC_PATH)
 
 TARGET = mydisambig
-SRC = mydisambig.cpp
+SRC = mydisambig.cpp mymap.cpp
 OBJ = $(SRC:.cpp=.o)
 FROM ?= Big5-ZhuYin.map
 TO ?= ZhuYin-Big5.map
